@@ -56,10 +56,12 @@ static inline void cryptodev_cipher_auth(struct cipher_data *cdata,
 #endif
 }
 
-static inline void cryptodev_cipher_set_tag_size(struct cipher_data *cdata, int size)
+static inline int cryptodev_cipher_set_tag_size(struct cipher_data *cdata, int size)
 {
 	if (likely(cdata->aead != 0))
-		crypto_aead_setauthsize(cdata->async.as, size);
+		return crypto_aead_setauthsize(cdata->async.as, size);
+	else
+		return -EINVAL;
 }
 
 static inline int cryptodev_cipher_get_tag_size(struct cipher_data *cdata)

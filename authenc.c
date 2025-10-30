@@ -579,10 +579,16 @@ auth_n_crypt(struct csession *ses_ptr, struct kernel_crypt_auth_op *kcaop,
 		return -EINVAL;
 	}
 
-	if (caop->tag_len)
-		cryptodev_cipher_set_tag_size(&ses_ptr->cdata, caop->tag_len);
-	else
+	if (caop->tag_len) {
+		ret = cryptodev_cipher_set_tag_size(&ses_ptr->cdata, caop->tag_len);
+		if (unlikely(ret)) {
+			derr(0, "cryptodev_cipher_set_tag_size: %d", ret);
+			return ret;
+		}
+	}
+	else {
 		caop->tag_len = max_tag_len;
+	}
 
 	cryptodev_cipher_auth(&ses_ptr->cdata, auth_sg, auth_len);
 
